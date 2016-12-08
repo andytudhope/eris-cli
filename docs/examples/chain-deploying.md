@@ -13,14 +13,7 @@ In general we are going to take two steps in order to get the chain setup:
 
 # Step 1. Deploy the Chain to Each Machine
 
-Now that we have our machines created we're ready to deploy the chain. We need to do one thing before we deploy the chain: we're going to need to change the config.toml files.
-
-```bash
-cd ~/.eris/chains/advchain
-cp ../default/config.toml .
-```
-
-Before we edit the file, let's get the IP address of our peer sergeant major node.
+Now that we have our machines created we're ready to deploy the chain. We need to do one thing before we deploy the chain: we're going to need to change the config.toml files. Before we edit the file, let's get the IP address of our peer sergeant major node.
 
 ```bash
 docker-machine ip my-advchain-val-000
@@ -28,9 +21,11 @@ docker-machine ip my-advchain-val-000
 
 You'll want to copy that IP address.
 
-Now let's open the `~/.eris/chains/advchain/config.toml` file in our favorite text editor. Edit the config file so it looks like this:
+Now let's open the `~/.eris/chains/advchain/config.toml` file in our favorite text editor (This is no longer where the config.toml file lives - it's now in the advchain_full_000 dir - or whatever you've called it. The whole section needs to be updated). Edit the config file so it looks like this:
 
 ```toml
+// The config file looks a little different in 0.12.0, maybe we should reflect that, though changing the seeds is all that matters here, so not nb.
+
 moniker = "something_different"
 seeds = "XX.XX.XX.XX:46656"
 fast_sync = false
@@ -49,19 +44,19 @@ For decentralized purists that may not like a single point of failure, a comma d
 docker-machine ip $(docker-machine ls -q)
 ```
 
-Note that in the `seeds` field you will use the IP address from docker-machine ip command rather than the `XX.XX.XX.XX` in the above.
+Note that in the `seeds` field you will use the IP address from docker-machine ip command rather than the `XX.XX.XX.XX` in the above. *Maybe insert the syntax for how an array of seeds might be entered? I would have found that useful.
 
 Now we will copy the config.toml into all of our directories.
 
 ```bash
-find . -mindepth 1 -maxdepth 1 -type d -exec cp config.toml {} \;
+find . -mindepth 1 -maxdepth 1 -type d -exec cp config.toml {} \;  //Also needs to be changed (I think)
 ```
 
 Now it's time to turn on the chain on our peer server / validator nodes.
 
-But first, a sidebar about ports. Understanding the ports is important for distributed software. If the blockchains *think* they are running on port X, but that port is exposed to the internet as port Y when they are doing their advertising to their peers they will be saying, "Hey, I'm located on IP address Z on port X". But the problem is that from the internet's perspective they should really be saying "Hey, I'm located on IP address Z on port Y".
+But first, a sidebar about ports. Understanding the ports is important for distributed software. If the blockchains *think* they are running on port X, but that port is exposed to the internet as port Y when they are doing their advertising to their peers they will be saying, "Hey, I'm located on IP address Z on port X". However, the problem is that - from the internet's perspective - they should really be saying, "Hey, I'm located on IP address Z on port Y".
 
-So at Eris we routinely recommend that you simply "flow through" the ports rather than trying to do anything funky here; this means that whatever port you select in the `laddr` fields and in the chain definition file, that you publish the same port on the host (meaning don't have something like `11111:46656` in your chain definition file). It can be made to work, but it requires some doing to do that right. But for now we will only be running one chain on each of our cloud validators so there will not be any port conflicts to worry about.
+So at Eris we routinely recommend that you simply "flow through" the ports rather than trying to do anything funky here; this means that whatever port you select in the `laddr` fields and in the chain definition file, that you publish the same port on the host (meaning don't have something like `11111:46656` in your chain definition file). It can be made to work, but it requires some doing to do that right. For now, we will only be running one chain on each of our cloud validators so there will not be any port conflicts to worry about.
 
 One thing to watch if you hard code the ports which the host machine will expose is that you will need to have these be unique for each chain so you will either only be able to run one chain per node or you'll need to use different ports for the other chain.
 
@@ -118,7 +113,7 @@ That's it, we added all that functionality to our system with that little comman
 Now we need to connect into the chain from our local nodes now that the cloud based validator nodes are all set up. That will take some time.
 
 ```bash
-eris chains new --dir advchain/advchain_root_000 advchain
+eris chains start advchain --init-dir advchain/advchain_root_000
 ```
 
 Check that it is running:
@@ -141,7 +136,7 @@ eris chains logs advchain -f --machine my-advchain-val-001
 
 Change the machine name to cycle thru the logs and make sure blocks are coming in.
 
-Oh wait. That didn't take long at all. Now you're all set up. Connected up to custom built, permissioned smart contract network with cloud based validators, given yourself admin permissions, and in what essentially has boiled down to move a few files around, edit a few lines in a few config files, and enter a few commands, we're ready to build out our applications.
+Oh wait. That didn't take long at all. Now you're all set up. Connected up to a custom built, permissioned smart contract network with cloud-based validators, given yourself admin permissions, and in what essentially has boiled down to moving a few files around, editing a few lines in a few config files, and entering a few commands, we're ready to build out our applications.
 
 # Clean Up
 
