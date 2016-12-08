@@ -17,20 +17,17 @@ eris chains rm -x idiaminchain
 
 Note, that we used the `-x` flag here (or, if you prefer the longhand `--data`). This will remove the "service" container of the chain (namely the eris:db "thing that goes") along with the "data" container of the chain (namely the "stuff I want to keep").
 
-# Step 2: Edit the genesis.json
+# Step 2: Edit the genesis.json *This whole section should prob be rewritten*
 
-How one does this depends on how one started the chain. If one started the chain by only using the default genesis.json, which happens when one does not do `eris chains start XXXXX --dir YYYYYYY` but rather does `eris chains start XXXXXXX` (without the `--dir`) flag, then you should edit the following file: `~/.eris/chains/default/genesis.json`. If one started the chain with the `--dir` flag, then you would edit the `genesis.json` in the directory.
+How you does this depends on how you started the chain. If you started the chain by only using the default genesis.json, which happens when you do not do `eris chains start XXXXX --init-dir YYYYYYY` but rather `eris chains start XXXXXXX` (without the `--init-dir`flag. *As far as I can tell, running `eris chains start` without the `--init-dir` flag fails no matter where you are in 0.12.0*), then you should edit the following file: `~/.eris/chains/default/genesis.json`. If one started the chain with the `--init-dir` flag, then you would edit the `genesis.json` in the directory.
 
 # Step 3: Turn the New Chain On
 
 ```
-eris chains new idiaminchain
+eris chains start idiaminchain --init-dir ~/.eris/chains/idiaminchain/idiaminchain_full_000/
 ```
 
-or
 
-```
-eris chains new idiaminchain --dir idiaminchain
-```
+or whatever command you used before. 
 
-or whatever command you used before. **N.B.**, we used `new` here rather than start. That is because we want to copy the reformulated genesis.json into the data container and ready for the service container to use when it starts again.
+**N.B.**, the `eris chains start` command has been deprecated because the genesis.json file is now generated automatically in each directory corresponding to an account.
